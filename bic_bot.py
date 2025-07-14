@@ -1,27 +1,27 @@
 from telegram import Bot
-from apscheduler.schedulers.blocking import BlockingScheduler
-import pytz
 import os
+from datetime import datetime
+import pytz
 
-TOKEN = os.getenv("8096317036:AAF9OM9mH1czKbjI9SKNj7R4N5-FqN-XSMo")
-CHAT_ID = os.getenv("-1002842464332")
+# Переменные из GitHub Secrets
+TOKEN = os.getenv("BOT_TOKEN")
+CHAT_ID = os.getenv("CHAT_ID")
 
+# Формируем сообщение
+moscow_tz = pytz.timezone('Europe/Moscow')
+now = datetime.now(moscow_tz).strftime('%H:%M %d.%m.%Y')
+
+message = (
+    f"📍 Финал дня ({now} МСК)\n\n"
+    "Пройдитесь по чек-листу перед тем как выключиться:\n\n"
+    "• Статус по дню — в проектный чат (или в общий, если не на проекте)\n"
+    "• Все актуальные файлы — в рабочие папки\n"
+    "• Документы и вкладки — закрыты\n"
+    "• Формула времени — заполнена\n\n"
+    "Если всё сделали — просто отметьтесь реакцией ✅\n"
+    "Хорошего вечера!"
+)
+
+# Отправляем
 bot = Bot(token=TOKEN)
-scheduler = BlockingScheduler(timezone=pytz.timezone('Europe/Moscow'))
-
-def send_reminder():
-    message = (
-        "📍 Финал дня\n\n"
-        "Пройдитесь по чек-листу перед тем как выключиться:\n\n"
-        "• Статус по дню — в проектный чат (или в общий, если не на проекте)\n"
-        "• Все актуальные файлы — в рабочие папки\n"
-        "• Документы и вкладки — закрыты\n"
-        "• Формула времени — заполнена\n\n"
-        "Если всё сделали — просто отметьтесь реакцией ✅\n"
-        "Хорошего вечера!"
-    )
-    bot.send_message(chat_id=CHAT_ID, text=message, parse_mode='Markdown')
-
-scheduler.add_job(send_reminder, 'cron', day_of_week='mon-fri', hour=17, minute=30)
-print("BIC запущен.")
-scheduler.start()
+bot.send_message(chat_id=CHAT_ID, text=message, parse_mode='Markdown')
